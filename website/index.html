@@ -6,6 +6,7 @@
   <title>Leviathan — Smart Whale Intelligence</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -650,7 +651,7 @@
   const { createClient } = supabase;
   const sb = createClient(
     'https://mjjhqswtzqlybinuhptw.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qamhxc3d0enFseWJpbnVocHR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNjE0MjcsImV4cCI6MjA5MjkzNzQyN30.1CQEhpm1WDOkj8CMqmjz95qDc46b_eD5xJvA7IHgaYA'
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qamhxc3d0enFseWJpbnVocHR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNjE0MjcsImV4cCI6MjA5MjkzNzQyN30.1CQEhpm1WDOkj8CMqmjz95qDc46b_e[...]
   );
 
   // ── State ─────────────────────────────────────────────────────
