@@ -22,7 +22,7 @@
 
     /* HERO */
     .hero { text-align: center; padding: 60px 24px 40px; max-width: 600px; margin: 0 auto; }
-    .hero-badge { display: inline-block; background: #1a2a4a; border: 1px solid #4f8eff; border-radius: 100px; padding: 6px 16px; font-size: 12px; color: #4f8eff; font-weight: 600; margin-bottom: 24px; letter-spacing: 1px; }
+    .hero-badge { display: inline-block; background: #1a2a4a; border: 1px solid #4f8eff; border-radius: 100px; padding: 6px 16px; font-size: 12px; color: #4f8eff; font-weight: 600; margin-bottom: 24px; }
     .hero h1 { font-size: 36px; font-weight: 700; line-height: 1.2; margin-bottom: 16px; }
     .hero h1 span { color: #4f8eff; }
     .hero p { color: #6b6b80; font-size: 16px; line-height: 1.7; margin-bottom: 32px; }
@@ -63,7 +63,7 @@
     /* FORMS */
     .form-group { margin-bottom: 16px; }
     .form-label { display: block; font-size: 13px; color: #6b6b80; margin-bottom: 6px; }
-    input[type="email"], input[type="password"], input[type="text"] { width: 100%; background: #0c0c12; border: 1px solid #1e1e2a; border-radius: 8px; padding: 12px 16px; font-size: 14px; color: #e8e8f0; outline: none; }
+    input[type="email"], input[type="password"], input[type="text"] { width: 100%; background: #0c0c12; border: 1px solid #1e1e2a; border-radius: 8px; padding: 12px 16px; font-size: 14px; color: #e8e8f0; }
     input:focus { border-color: #4f8eff; }
     input::placeholder { color: #6b6b80; }
     .full-btn { width: 100%; padding: 13px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; border: none; margin-top: 8px; }
@@ -94,7 +94,7 @@
     .copy-box:active { border-color: #4f8eff; }
 
     /* TOAST */
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: #111118; border: 1px solid #22d47a; border-radius: 8px; padding: 14px 24px; font-size: 14px; color: #22d47a; z-index: 999; transition: transform 0.3s; white-space: nowrap; }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: #111118; border: 1px solid #22d47a; border-radius: 8px; padding: 14px 24px; font-size: 14px; transition: 0.3s; color: #22d47a; }
     .toast.show { transform: translateX(-50%) translateY(0); }
     .toast.err { border-color: #ff4f4f; color: #ff4f4f; }
 
@@ -266,7 +266,7 @@
   // ── Init Supabase ──────────────────────────────────────────
   const sb = supabase.createClient(
     'https://mjjhqswtzqlybinuhptw.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qamhxc3d0enFseWJpbnVocHR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNjE0MjcsImV4cCI6MjA5MjkzNzQyN30.1CQEhpm1WDOkj8CMqmjz95qDc46b_eD5xJvA7IHgaYA'
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qamhxc3d0enFseWJpbnVocHR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNjE0MjcsImV4cCI6MjA5MjkzNzQyN30.1CQEhpm1WDOkj8CMqmjz95qDc46b_eJ_15kXVGLlIhA'
   );
 
   let authMode = 'signup';
@@ -523,12 +523,12 @@
     btn.textContent = 'Please wait...';
 
     if (authMode === 'signup') {
-      const { error } = await sb.auth.signUp({ email, password });
-      if (error) { errEl.textContent = error.message; errEl.className = 'alert alert-error show'; }
-      else { okEl.textContent = 'Account created! Check your email to confirm, then sign in.'; okEl.className = 'alert alert-success show'; }
+      const { data, error } = await sb.auth.signUp({ email, password });
+      if (error) { errEl.textContent = error.message || JSON.stringify(error); errEl.className = 'alert alert-error show'; }
+      else { okEl.textContent = 'Account created! You can now sign in.'; okEl.className = 'alert alert-success show'; }
     } else {
-      const { error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) { errEl.textContent = error.message; errEl.className = 'alert alert-error show'; }
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) { errEl.textContent = error.message || 'Invalid credentials. Please try again.'; errEl.className = 'alert alert-error show'; }
     }
 
     btn.disabled = false;
