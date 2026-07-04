@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leviathan — Whale Intelligence</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+body { margin: 0; padding: 0; background: #060608; color: #ffffff; font-family: Arial, Helvetica, sans-serif; }
+.nav { background: #0f0f14; border-bottom: 1px solid #222; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; right: 0; z-index: 99; }
+.logo { font-size: 17px; font-weight: 700; color: #fff; letter-spacing: 1px; }
+.logo b { color: #4f8eff; }
+.nav-right { display: flex; gap: 8px; }
+.btn { padding: 9px 18px; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
+.btn-blue { background: #4f8eff; color: #fff; }
+.btn-outline { background: transparent; color: #888; border: 1px solid #333; }
+.page { padding-top: 64px; }
+.hero { text-align: center; padding: 60px 20px 40px; }
+.badge { display: inline-block; background: #111a2e; border: 1px solid #4f8eff; color: #4f8eff; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+.hero h1 { font-size: 32px; font-weight: 700; line-height: 1.3; margin: 0 0 14px; }
+.hero h1 span { color: #4f8eff; }
+.hero p { color: #888; font-size: 15px; line-height: 1.6; max-width: 480px; margin: 0 auto 28px; }
+.hero-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.btn-big { padding: 13px 26px; font-size: 15px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; }
+.btn-big-blue { background: #4f8eff; color: #fff; }
+.btn-big-outline { background: transparent; color: #888; border: 1px solid #333; }
+.preview { max-width: 480px; margin: 40px auto; padding: 0 20px; }
+.preview-card { background: #0f0f14; border: 1px solid #222; border-radius: 10px; padding: 18px; margin-bottom: 10px; }
+.preview-chain { font-size: 11px; color: #666; margin-bottom: 4px; }
+.preview-amount { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.preview-signal { font-size: 13px; }
+.green { color: #22d47a; }
+.red { color: #ff4f4f; }
+.gold { color: #f5c842; }
+.section { max-width: 480px; margin: 0 auto; padding: 0 20px 50px; }
+.section h2 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+.section p { color: #888; font-size: 14px; margin-bottom: 20px; }
+.feature { background: #0f0f14; border: 1px solid #222; border-radius: 8px; padding: 16px; margin-bottom: 10px; }
+.feature h3 { font-size: 14px; font-weight: 700; margin: 0 0 4px; }
+.feature p { font-size: 13px; color: #777; margin: 0; }
+.tier-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.tier { flex: 1; min-width: 180px; background: #0f0f14; border: 1px solid #222; border-radius: 10px; padding: 22px; }
+.tier.best { border-color: #4f8eff; }
+.tier-name { font-size: 11px; color: #666; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.tier-price { font-size: 36px; font-weight: 700; margin-bottom: 2px; }
+.tier-period { font-size: 13px; color: #666; margin-bottom: 14px; }
+.tier ul { list-style: none; padding: 0; margin: 0 0 18px; }
+.tier ul li { font-size: 13px; padding: 6px 0; border-bottom: 1px solid #1a1a1a; display: flex; gap: 8px; }
+.tier ul li:last-child { border: none; }
+.ck { color: #22d47a; } .lk { color: #555; }
+.tier-btn { width: 100%; padding: 11px; border-radius: 7px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; }
+.tier-btn-blue { background: #4f8eff; color: #fff; }
+.tier-btn-gold { background: #f5c842; color: #111; }
+.divider { border: none; border-top: 1px solid #1a1a1a; margin: 40px 20px; }
+.footer { text-align: center; padding: 24px; color: #555; font-size: 13px; border-top: 1px solid #1a1a1a; }
+.footer a { color: #4f8eff; text-decoration: none; }
+
+/* MODAL */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; justify-content: center; align-items: center; padding: 20px; }
+.overlay.on { display: flex; }
+.modal { background: #0f0f14; border: 1px solid #333; border-radius: 14px; padding: 28px; width: 100%; max-width: 400px; }
+.modal h3 { font-size: 20px; font-weight: 700; margin: 0 0 6px; }
+.modal-sub { color: #888; font-size: 14px; margin-bottom: 22px; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 13px; color: #888; margin-bottom: 6px; }
+.field input { width: 100%; background: #060608; border: 1px solid #333; border-radius: 7px; padding: 12px 14px; font-size: 14px; color: #fff; outline: none; box-sizing: border-box; }
+.field input:focus { border-color: #4f8eff; }
+.mbtn { width: 100%; padding: 13px; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; border: none; margin-top: 6px; }
+.mbtn-blue { background: #4f8eff; color: #fff; }
+.mbtn-ghost { background: transparent; color: #666; border: 1px solid #333; margin-top: 8px; }
+.msg { padding: 11px 14px; border-radius: 7px; font-size: 13px; margin-top: 10px; display: none; }
+.msg.on { display: block; }
+.msg-err { background: rgba(255,79,79,0.1); border: 1px solid #ff4f4f; color: #ff4f4f; }
+.msg-ok { background: rgba(34,212,122,0.1); border: 1px solid #22d47a; color: #22d47a; }
+.switch { font-size: 13px; color: #666; text-align: center; margin-top: 14px; }
+.switch a { color: #4f8eff; cursor: pointer; }
+
+/* DASHBOARD */
+#dash { display: none; padding-top: 64px; }
+.dash-wrap { max-width: 480px; margin: 0 auto; padding: 32px 20px; }
+.dash-name { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.dash-email { color: #666; font-size: 14px; margin-bottom: 20px; }
+.pill { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 20px; }
+.pill-free { background: #1a1a1a; color: #666; }
+.pill-premium { background: rgba(245,200,66,0.15); color: #f5c842; border: 1px solid #f5c842; }
+.pill-admin { background: rgba(79,142,255,0.15); color: #4f8eff; border: 1px solid #4f8eff; }
+.dcard { background: #0f0f14; border: 1px solid #222; border-radius: 10px; padding: 22px; margin-bottom: 14px; }
+.dcard.green { border-color: #22d47a; }
+.dcard.gold { border-color: #f5c842; }
+.dcard.blue { border-color: #4f8eff; }
+.dcard h3 { font-size: 16px; font-weight: 700; margin: 0 0 6px; }
+.dcard p { color: #777; font-size: 14px; margin: 0 0 14px; }
+.dbtn { width: 100%; padding: 12px; border-radius: 7px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; }
+.dbtn-blue { background: #4f8eff; color: #fff; }
+.dbtn-gold { background: #f5c842; color: #111; }
+.dbtn-ghost { background: transparent; color: #666; border: 1px solid #333; margin-top: 8px; }
+.link-box { background: #060608; border: 1px solid #4f8eff; border-radius: 7px; padding: 14px; font-size: 13px; color: #4f8eff; word-break: break-all; cursor: pointer; margin-top: 10px; }
+.copy-addr { background: #060608; border: 1px solid #333; border-radius: 7px; padding: 12px; font-size: 12px; color: #ccc; word-break: break-all; cursor: pointer; margin-top: 8px; font-family: monospace; }
+.step-box { background: #060608; border: 1px solid #222; border-radius: 7px; padding: 14px; margin-bottom: 10px; }
+.step-label { font-size: 11px; color: #4f8eff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(80px); background: #0f0f14; border: 1px solid #22d47a; border-radius: 8px; padding: 12px 22px; font-size: 14px; color: #22d47a; z-index: 9999; transition: transform 0.25s; white-space: nowrap; }
+.toast.on { transform: translateX(-50%) translateY(0); }
+.toast.err { border-color: #ff4f4f; color: #ff4f4f; }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="logo">LEVIA<b>THAN</b></div>
+  <div class="nav-right" id="nav-right">
+    <button class="btn btn-outline" onclick="openModal('login')">Sign in</button>
+    <button class="btn btn-blue" onclick="openModal('signup')">Get started</button>
+  </div>
+</div>
+
+<!-- LANDING -->
+<div id="land" class="page">
+  <div class="hero">
+    <div class="badge">⟠ ETH &nbsp;·&nbsp; 🔵 Base &nbsp;·&nbsp; ◎ SOL</div>
+    <h1>Track the <span>whales.</span><br>Before the market knows.</h1>
+    <p>Real-time multi-chain whale tracking with smart signals delivered straight to your Telegram.</p>
+    <div class="hero-btns">
+      <button class="btn-big btn-big-blue" onclick="openModal('signup')">Start free — no card</button>
+      <button class="btn-big btn-big-outline" onclick="scrollTo('#features')">How it works</button>
+    </div>
+  </div>
+
+  <div class="preview">
+    <div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">● Live feed preview</div>
+    <div class="preview-card">
+      <div class="preview-chain">⟠ ETHEREUM · USDT</div>
+      <div class="preview-amount">$2.1M</div>
+      <div class="preview-signal green">🟢 Accumulation · 84% confidence</div>
+    </div>
+    <div class="preview-card">
+      <div class="preview-chain">◎ SOLANA · USDC</div>
+      <div class="preview-amount">$780K</div>
+      <div class="preview-signal red">🔴 Sell Pressure · 71% confidence</div>
+    </div>
+    <div class="preview-card">
+      <div class="preview-chain">🔵 BASE · USDC</div>
+      <div class="preview-amount">$1.4M</div>
+      <div class="preview-signal gold">⚡ Cluster · 3 wallets coordinated</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section" id="features">
+    <h2>Intelligence, not noise</h2>
+    <p>Every other tracker gives you raw numbers. We give you signals.</p>
+    <div class="feature"><h3>🔍 Multi-chain monitoring</h3><p>Ethereum, Base and Solana tracked every minute.</p></div>
+    <div class="feature"><h3>🧠 Smart signals</h3><p>Accumulation, Sell Pressure or Neutral with confidence score.</p></div>
+    <div class="feature"><h3>⚡ Cluster detection</h3><p>Multiple wallets moving the same token flagged instantly.</p></div>
+    <div class="feature"><h3>🏷️ Wallet labels</h3><p>Know if it's Binance, Coinbase, or smart money instantly.</p></div>
+    <div class="feature"><h3>📲 Telegram-native</h3><p>Signals arrive in your DMs. No app to open ever.</p></div>
+    <div class="feature"><h3>🎯 Result tracking</h3><p>Every signal scored against price at 15min, 1hr and 24hr.</p></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <h2>Simple pricing</h2>
+    <p>Free forever. Upgrade when ready.</p>
+    <div class="tier-row">
+      <div class="tier">
+        <div class="tier-name">Free</div>
+        <div class="tier-price">$0</div>
+        <div class="tier-period">forever</div>
+        <ul>
+          <li><span class="ck">✓</span> Moves above $500K</li>
+          <li><span class="ck">✓</span> 15-min delay</li>
+          <li><span class="ck">✓</span> 5 alerts per day</li>
+          <li><span class="lk">🔒</span> No smart signals</li>
+          <li><span class="lk">🔒</span> No wallet labels</li>
+        </ul>
+        <button class="tier-btn tier-btn-blue" onclick="openModal('signup')">Get started</button>
+      </div>
+      <div class="tier best">
+        <div class="tier-name">Premium</div>
+        <div class="tier-price">$25</div>
+        <div class="tier-period">per 30 days · USDT</div>
+        <ul>
+          <li><span class="ck">✓</span> Real-time signals</li>
+          <li><span class="ck">✓</span> Moves above $100K</li>
+          <li><span class="ck">✓</span> Unlimited alerts</li>
+          <li><span class="ck">✓</span> Smart signals + %</li>
+          <li><span class="ck">✓</span> Wallet labels</li>
+          <li><span class="ck">✓</span> Cluster detection</li>
+          <li><span class="ck">✓</span> Daily 8AM summary</li>
+        </ul>
+        <button class="tier-btn tier-btn-gold" onclick="openModal('signup')">Upgrade</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <strong style="color:#fff;">LEVIATHAN</strong> &nbsp;·&nbsp; Smart Whale Intelligence &nbsp;·&nbsp;
+    <a href="https://t.me/LeviathanWhaleBot">@LeviathanWhaleBot</a>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dash">
+  <div class="dash-wrap" id="dash-inner"></div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="overlay" id="modal">
+  <div class="modal">
+    <h3 id="m-title">Create account</h3>
+    <div class="modal-sub" id="m-sub">Free forever. No card required.</div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="m-email" placeholder="you@example.com">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="m-pass" placeholder="Min 8 characters">
+    </div>
+    <div class="msg msg-err" id="m-err"></div>
+    <div class="msg msg-ok" id="m-ok"></div>
+    <button class="mbtn mbtn-blue" id="m-btn" onclick="doAuth()">Create account</button>
+    <button class="mbtn mbtn-ghost" onclick="closeModal()">Cancel</button>
+    <div class="switch"><span id="sw-txt">Already have an account?</span> <a id="sw-link" onclick="toggleMode()">Sign in</a></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+var SUPABASE_URL = 'https://mjjhqswtzqlybinuhptw.supabase.co';
+var ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qamhxc3d0enFseWJpbnVocHR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNjE0MjcsImV4cCI6MjA5MjkzNzQyN30.1CQEhpm1WDOkj8CMqmjz95qDc46b_eD5xJvA7IHgaYA';
+
+var sb = null;
+var mode = 'signup';
+var user = null;
+
+window.onload = function() {
+  try {
+    sb = supabase.createClient(SUPABASE_URL, ANON_KEY);
+    sb.auth.onAuthStateChange(function(event, session) {
+      if (session && session.user) {
+        user = session.user;
+        closeModal();
+        loadDash();
+      } else {
+        user = null;
+        showLand();
+      }
+    });
+  } catch(e) {
+    showToast('Failed to connect. Refresh the page.', true);
+  }
+};
+
+function showLand() {
+  document.getElementById('land').style.display = 'block';
+  document.getElementById('dash').style.display = 'none';
+  document.getElementById('nav-right').innerHTML = '<button class="btn btn-outline" onclick="openModal(\'login\')">Sign in</button><button class="btn btn-blue" onclick="openModal(\'signup\')">Get started</button>';
+}
+
+function scrollTo(id) {
+  var el = document.querySelector(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
+
+// AUTH MODAL
+function openModal(m) {
+  mode = m;
+  document.getElementById('modal').classList.add('on');
+  document.getElementById('m-title').textContent = m === 'signup' ? 'Create account' : 'Welcome back';
+  document.getElementById('m-sub').textContent = m === 'signup' ? 'Free forever. No card required.' : 'Sign in to your account.';
+  document.getElementById('m-btn').textContent = m === 'signup' ? 'Create account' : 'Sign in';
+  document.getElementById('sw-txt').textContent = m === 'signup' ? 'Already have an account?' : "Don't have an account?";
+  document.getElementById('sw-link').textContent = m === 'signup' ? 'Sign in' : 'Sign up';
+  clearMsgs();
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('on');
+}
+
+function toggleMode() {
+  openModal(mode === 'signup' ? 'login' : 'signup');
+}
+
+function clearMsgs() {
+  document.getElementById('m-err').className = 'msg msg-err';
+  document.getElementById('m-ok').className = 'msg msg-ok';
+}
+
+function showErr(txt) {
+  document.getElementById('m-err').textContent = txt;
+  document.getElementById('m-err').className = 'msg msg-err on';
+}
+
+function showOk(txt) {
+  document.getElementById('m-ok').textContent = txt;
+  document.getElementById('m-ok').className = 'msg msg-ok on';
+}
+
+function doAuth() {
+  if (!sb) { showErr('Not connected. Refresh the page.'); return; }
+  var email = document.getElementById('m-email').value.trim();
+  var pass = document.getElementById('m-pass').value;
+  var btn = document.getElementById('m-btn');
+  clearMsgs();
+  if (!email) { showErr('Please enter your email.'); return; }
+  if (!pass || pass.length < 8) { showErr('Password must be at least 8 characters.'); return; }
+  btn.disabled = true;
+  btn.textContent = 'Please wait...';
+  if (mode === 'signup') {
+    sb.auth.signUp({ email: email, password: pass }).then(function(res) {
+      btn.disabled = false;
+      btn.textContent = 'Create account';
+      if (res.error) {
+        showErr(res.error.message || 'Signup failed. Try again.');
+      } else {
+        showOk('Account created! You can now sign in.');
+      }
+    }).catch(function(e) {
+      btn.disabled = false;
+      btn.textContent = 'Create account';
+      showErr('Error: ' + e.message);
+    });
+  } else {
+    sb.auth.signInWithPassword({ email: email, password: pass }).then(function(res) {
+      btn.disabled = false;
+      btn.textContent = 'Sign in';
+      if (res.error) {
+        showErr(res.error.message || 'Invalid credentials.');
+      }
+    }).catch(function(e) {
+      btn.disabled = false;
+      btn.textContent = 'Sign in';
+      showErr('Error: ' + e.message);
+    });
+  }
+}
+
+// DASHBOARD
+function loadDash() {
+  document.getElementById('land').style.display = 'none';
+  document.getElementById('dash').style.display = 'block';
+  document.getElementById('nav-right').innerHTML = '<button class="btn btn-outline" onclick="doSignOut()">Sign out</button>';
+  document.getElementById('dash-inner').innerHTML = '<p style="color:#666;text-align:center;padding:40px 0;">Loading...</p>';
+  sb.from('profiles').select('*').eq('id', user.id).single().then(function(res) {
+    if (res.error || !res.data) {
+      document.getElementById('dash-inner').innerHTML = '<p style="color:#ff4f4f;text-align:center;padding:40px 0;">Error loading profile. Sign out and try again.</p>';
+      return;
+    }
+    renderDash(res.data);
+  });
+}
+
+function renderDash(p) {
+  var tier = p.tier;
+  var tgOn = !!p.telegram_id;
+  var tgName = p.telegram_username ? '@' + p.telegram_username : 'Connected';
+  var proUntil = p.pro_until ? new Date(p.pro_until).toDateString() : null;
+  var html = '';
+  html += '<div class="dash-name">Welcome back 👋</div>';
+  html += '<div class="dash-email">' + user.email + '</div>';
+  html += '<span class="pill pill-' + tier + '">' + tier.toUpperCase() + '</span>';
+
+  // Telegram
+  if (tgOn) {
+    html += '<div class="dcard green"><h3>✅ Telegram Connected</h3><p>' + tgName + ' — signals arriving in your DMs.</p></div>';
+  } else {
+    html += '<div class="dcard" id="tg-card"><h3>📲 Connect Telegram</h3><p>Get whale signals delivered directly to your Telegram DMs.</p><button class="dbtn dbtn-blue" onclick="genTgLink()">Generate Telegram Link</button><div id="tg-link"></div></div>';
+  }
+
+  // Premium expiry
+  if (proUntil && tier === 'premium') {
+    html += '<div class="dcard gold"><h3>💎 Premium Active</h3><p>Expires on ' + proUntil + '</p></div>';
+  }
+
+  // Upgrade (free only)
+  if (tier === 'free') {
+    html += '<div class="dcard gold" id="up-card"><h3>💎 Upgrade to Premium</h3><p>Pay $25 USDT on Solana. Auto-activates in 2 minutes. No card needed.</p><button class="dbtn dbtn-gold" onclick="showUpgrade()">Upgrade — $25 USDT</button></div>';
+    html += '<div id="up-steps" style="display:none;">';
+    html += '<div class="dcard"><h3 style="margin-bottom:16px;">💰 Pay with USDT on Solana</h3>';
+    html += '<div class="step-box"><div class="step-label">Step 1 — Your sending wallet</div><p style="font-size:13px;color:#777;margin-bottom:8px;">Paste the Solana wallet you will send FROM:</p><input type="text" id="sw-input" placeholder="Your Phantom wallet address..." style="width:100%;background:#060608;border:1px solid #333;border-radius:7px;padding:11px 13px;font-size:13px;color:#fff;outline:none;box-sizing:border-box;"></div>';
+    html += '<div class="step-box"><div class="step-label">Step 2 — Send exactly 25 USDT here</div><div class="copy-addr" onclick="copyAddr()">ETv38hfME7CYHYXg1KqeL9mBtdEtjNsA3R9Csyc5pfPY</div><p style="font-size:12px;color:#555;margin-top:6px;">Tap to copy · USDT on Solana only</p></div>';
+    html += '<div class="step-box"><div class="step-label">Step 3 — Done</div><p style="font-size:13px;color:#777;">After sending tap below. Premium activates automatically.</p></div>';
+    html += '<div class="msg msg-err" id="pay-err"></div><div class="msg msg-ok" id="pay-ok"></div>';
+    html += '<button class="dbtn dbtn-gold" onclick="doPay()" style="margin-top:12px;">I have sent the payment ✓</button>';
+    html += '<button class="dbtn dbtn-ghost" onclick="hideUpgrade()">Cancel</button>';
+    html += '</div></div>';
+  }
+
+  // Admin
+  if (tier === 'admin') {
+    html += '<div class="dcard blue"><h3>👑 Admin Access</h3><p>Full access active. Use /stats and /recent in the Telegram bot.</p></div>';
+  }
+
+  document.getElementById('dash-inner').innerHTML = html;
+
+  if (tier === 'free') {
+    sb.channel('pay-ch').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'payment_intents', filter: 'user_id=eq.' + user.id }, function(payload) {
+      if (payload.new && payload.new.status === 'confirmed') {
+        showToast('Payment confirmed! Premium activated!');
+        loadDash();
+      }
+    }).subscribe();
+  }
+}
+
+function genTgLink() {
+  if (!sb || !user) return;
+  var btn = document.querySelector('#tg-card .dbtn');
+  btn.disabled = true; btn.textContent = 'Generating...';
+  var arr = new Uint8Array(20);
+  crypto.getRandomValues(arr);
+  var token = Array.from(arr).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+  var expires = new Date(Date.now() + 600000).toISOString();
+  sb.from('profiles').update({ telegram_bind_token: token, telegram_bind_expires_at: expires }).eq('id', user.id).then(function(res) {
+    if (res.error) { showToast('Error. Try again.', true); btn.disabled = false; btn.textContent = 'Generate Telegram Link'; return; }
+    var link = 'https://t.me/LeviathanWhaleBot?start=' + token;
+    document.getElementById('tg-link').innerHTML = '<p style="font-size:13px;color:#666;margin:10px 0 6px;">Open in Telegram to connect:</p><div class="link-box" onclick="navigator.clipboard.writeText(\'' + link + '\').then(function(){showToast(\'Link copied!\');})">' + link + '</div><p style="font-size:12px;color:#555;margin-top:6px;">⏳ Expires in 10 minutes · Tap to copy</p>';
+    btn.disabled = false; btn.textContent = 'Regenerate Link';
+  });
+}
+
+function showUpgrade() {
+  document.getElementById('up-card').style.display = 'none';
+  document.getElementById('up-steps').style.display = 'block';
+  document.getElementById('up-steps').scrollIntoView({ behavior: 'smooth' });
+}
+
+function hideUpgrade() {
+  document.getElementById('up-card').style.display = 'block';
+  document.getElementById('up-steps').style.display = 'none';
+}
+
+function copyAddr() {
+  navigator.clipboard.writeText('ETv38hfME7CYHYXg1KqeL9mBtdEtjNsA3R9Csyc5pfPY').then(function(){ showToast('Address copied!'); });
+}
+
+function doPay() {
+  if (!sb || !user) return;
+  var wallet = document.getElementById('sw-input').value.trim();
+  var errEl = document.getElementById('pay-err');
+  var okEl = document.getElementById('pay-ok');
+  errEl.className = 'msg msg-err'; okEl.className = 'msg msg-ok';
+  if (!wallet || wallet.length < 32) { errEl.textContent = 'Please enter your Solana wallet address.'; errEl.className = 'msg msg-err on'; return; }
+  sb.from('payment_intents').insert({ user_id: user.id, sender_wallet: wallet, expected_usdt: 25, status: 'pending' }).then(function(res) {
+    if (res.error) { errEl.textContent = res.error.message.includes('unique') ? 'Pending payment already exists. Wait for it to process.' : 'Error. Try again.'; errEl.className = 'msg msg-err on'; return; }
+    okEl.textContent = '✅ Submitted! Premium activates automatically within 2 minutes of your payment confirming.';
+    okEl.className = 'msg msg-ok on';
+  });
+}
+
+function doSignOut() {
+  if (sb) sb.auth.signOut();
+}
+
+function showToast(msg, err) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast on' + (err ? ' err' : '');
+  setTimeout(function(){ el.className = 'toast'; }, 3000);
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
+});
+</script>
+</body>
+</html>
