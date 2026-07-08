@@ -1,10 +1,14 @@
-name: Deploy Supabase Functions
+name: Leviathan Engine
 on:
+  schedule:
+    - cron: '* * * * *'
   push:
     branches:
       - main
+
 jobs:
   deploy:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -29,3 +33,26 @@ jobs:
       - run: supabase functions deploy telegram-daily-summary --no-verify-jwt
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+  poll:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Poll whales
+        run: |
+          curl -X POST "https://mjjhqswtzqlybinuhptw.supabase.co/functions/v1/poll-whales" \
+            -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qamhxc3d0enFseWJpbnVocHR3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzM2MTQyNywiZXhwIjoyMDkyOTM3NDI3fQ.T0xrAy3bpZkLhwS9anKm9y_lRUaQUwp1_RCh_n_oiJU" \
+            -H "Content-Type: application/json" \
+            -d '{}'
+      - name: Telegram fanout
+        run: |
+          curl -X POST "https://mjjhqswtzqlybinuhptw.supabase.co/functions/v1/telegram-fanout" \
+            -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qamhxc3d0enFseWJpbnVocHR3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzM2MTQyNywiZXhwIjoyMDkyOTM3NDI3fQ.T0xrAy3bpZkLhwS9anKm9y_lRUaQUwp1_RCh_n_oiJU" \
+            -H "Content-Type: application/json" \
+            -d '{}'
+      - name: Poll payments
+        run: |
+          curl -X POST "https://mjjhqswtzqlybinuhptw.supabase.co/functions/v1/solana-payment-poller" \
+            -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qamhxc3d0enFseWJpbnVocHR3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzM2MTQyNywiZXhwIjoyMDkyOTM3NDI3fQ.T0xrAy3bpZkLhwS9anKm9y_lRUaQUwp1_RCh_n_oiJU" \
+            -H "Content-Type: application/json" \
+            -d '{}'
