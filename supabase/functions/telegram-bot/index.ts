@@ -3,7 +3,7 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN')!;
+const BOT_TOKEN = '8535612141:AAGQ_bUEPA6n5SxPEx1tPYEPJYrs9sLRDtc';
 const ADMIN_TELEGRAM_ID = '7230717710';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
