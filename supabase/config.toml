@@ -1,0 +1,14 @@
+[functions.poll-whales]
+verify_jwt = false
+
+[functions.telegram-fanout]
+verify_jwt = false
+
+[functions.telegram-bot]
+verify_jwt = false
+
+[functions.solana-payment-poller]
+verify_jwt = false
+
+[functions.telegram-daily-summary]
+verify_jwt = false
