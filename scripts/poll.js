@@ -88,7 +88,9 @@ async function fanoutToTelegram(evt) {
   }
 
   // Free users — only if above free threshold and delayed
-  if (amountUsd >= FREE_THRESHOLD) {
+  const occurredAt = new Date(evt.occurred_at).getTime();
+const fifteenMinAgo = Date.now() - 15 * 60 * 1000;
+if (amountUsd >= FREE_THRESHOLD && occurredAt <= fifteenMinAgo) {
     const { data: freeUsers } = await supabase.from('profiles').select('telegram_id').eq('tier', 'free').not('telegram_id', 'is', null);
     const midnight = new Date(); midnight.setUTCHours(0,0,0,0);
 
