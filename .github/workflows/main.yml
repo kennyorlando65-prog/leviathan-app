@@ -11,7 +11,7 @@ jobs:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: supabase/setup-cli@v1
         with:
           version: latest
@@ -38,19 +38,19 @@ jobs:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
       - name: Install dependencies
         run: npm install @supabase/supabase-js
       - name: Run whale poller
         env:
-          SUPABASE_URL: https://mjjhqswtzqlybinuhptw.supabase.co
-          SUPABASE_SERVICE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1qamhxc3d0enFseWJpbnVocHR3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzM2MTQyNywiZXhwIjoyMDkyOTM3NDI3fQ.T0xrAy3bpZkLhwS9anKm9y_lRUaQUwp1_RCh_n_oiJU
-          ETH_RPC: https://eth-mainnet.g.alchemy.com/v2/gaIe7JDRIt99RUjvdXRUF
-          BASE_RPC: https://base-mainnet.g.alchemy.com/v2/IiV3-q61aNW102LT0u1Ev
-          SOL_RPC: https://solana-mainnet.g.alchemy.com/v2/mZRxIq3Vsr5WqE7g2jQAn
-          COINGECKO_KEY: CG-FENiGb2fPRzznRvGL2KPzSGA
-          TELEGRAM_BOT_TOKEN: 8535612141:AAGQ_bUEPA6n5SxPEx1tPYEPJYrs9sLRDtc
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ETH_RPC: ${{ secrets.ETH_RPC }}
+          BASE_RPC: ${{ secrets.BASE_RPC }}
+          SOL_RPC: ${{ secrets.SOL_RPC }}
+          COINGECKO_KEY: ${{ secrets.COINGECKO_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: node scripts/poll.js
