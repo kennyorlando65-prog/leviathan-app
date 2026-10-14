@@ -1,0 +1,26 @@
+# dependencies
+node_modules/
+
+# local env files - NEVER commit real values
+.env
+.env.*
+!.env.example
+
+# build output
+dist/
+build/
+.next/
+out/
+
+# logs
+*.log
+npm-debug.log*
+
+# editor / os
+.DS_Store
+.idea/
+.vscode/
+
+# supabase local stack
+supabase/.branches
+supabase/.temp
